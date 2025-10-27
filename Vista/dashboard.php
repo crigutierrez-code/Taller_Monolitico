@@ -14,6 +14,5 @@ try {
 /* ---------- búsqueda ---------- */
 $search = $_GET['search'] ?? '';
 if ($search === '') {
-    $students = estuden::getAll($db);
+    $students = estudent::getAll($db);
 }
-?>

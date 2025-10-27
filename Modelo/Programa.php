@@ -5,17 +5,25 @@ namespace Modelo;
 use mysqli;
 use Exception;
 
-class program {
- private $code ;   
- private $name ;
-function __construct($code, $name) {
-    $this->code= $code;
-    $this->name= $name;
-}
-public function getNombre(): string { return $this-> name; }    
-public function getCodigo(): string { return $this-> code; }
+class program
+{
+    private $code;
+    private $name;
+    function __construct($code, $name)
+    {
+        $this->code = $code;
+        $this->name = $name;
+    }
+    public function getNombre(): string
+    {
+        return $this->name;
+    }
+    public function getCodigo(): string
+    {
+        return $this->code;
+    }
 
-public function guardar(mysqli $db): bool
+    public function guardar(mysqli $db): bool
     {
         $sql = "INSERT INTO programas (codigo, nombre) VALUES (?, ?)";
         $stmt = $db->prepare($sql);
@@ -28,14 +36,14 @@ public function guardar(mysqli $db): bool
         return $ok;
     }
 
-public static function crear(mysqli $db, string $code, string $name): self
+    public static function crear(mysqli $db, string $code, string $name): self
     {
-        $est = new program ($code,  $name);
+        $est = new program($code,  $name);
         $est->guardar($db);
         return $est;
     }
 
-public static function getAll(mysqli $db): array
+    public static function getAll(mysqli $db): array
     {
         $sql    = "SELECT nombre, codigo FROM programa";
         $result = $db->query($sql);
@@ -50,11 +58,10 @@ public static function getAll(mysqli $db): array
         return $program;
     }
 
-public static function delet($name)
+    public static function delet($name)
     {
         $sql = "SELECT codigo  FROM programa where programa like {$name}";
         $sql1 = "SELECT nombre, programa  FROM materia where programa like {$sql}";
-        return $sql1 ;
+        return $sql1;
     }
 }
-?>

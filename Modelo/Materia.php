@@ -5,21 +5,32 @@ namespace Modelo;
 use mysqli;
 use Exception;
 
-class subject {
- private $code ;   
- private $name;
- private $program;
+class subject
+{
+    private $code;
+    private $name;
+    private $program;
 
-function __construct($code, $name, $program) {
-    $this-> code= $code;
-    $this-> name= $name;
-    $this-> program= $program;
-}
-public function getNombre(): string { return $this->code; }    
-public function getCodigo(): string { return $this->name; }
-public function getEmail(): string  { return $this->program;  }
+    function __construct($code, $name, $program)
+    {
+        $this->code = $code;
+        $this->name = $name;
+        $this->program = $program;
+    }
+    public function getNombre(): string
+    {
+        return $this->code;
+    }
+    public function getCodigo(): string
+    {
+        return $this->name;
+    }
+    public function getEmail(): string
+    {
+        return $this->program;
+    }
 
-public function guardar(mysqli $db): bool
+    public function guardar(mysqli $db): bool
     {
         $sql = "INSERT INTO  materias( codigo, nombre ,programa ) VALUES (?, ?, ?)";
         $stmt = $db->prepare($sql);
@@ -32,14 +43,14 @@ public function guardar(mysqli $db): bool
         return $ok;
     }
 
-public static function crear(mysqli $db, string $code, string $name, string $program): self
+    public static function crear(mysqli $db, string $code, string $name, string $program): self
     {
         $est = new subject($code, $name, $program);
         $est->guardar($db);
         return $est;
     }
 
-public static function getAll(mysqli $db): array
+    public static function getAll(mysqli $db): array
     {
         $sql    = "SELECT ocdigo, nombre, paragrama FROM  materias";
         $result = $db->query($sql);
@@ -55,11 +66,10 @@ public static function getAll(mysqli $db): array
         return $students;
     }
 
-public static function delet($name)
+    public static function delet($name)
     {
         $sql = "SELECT codigo  FROM materias where nombre like {$name}";
         $sql1 = "SELECT nombre, programa  FROM progarma where programa like {$sql}";
-        return $sql1 ;
+        return $sql1;
     }
 }
-?>
