@@ -14,7 +14,7 @@ class program
         $this->code = $code;
         $this->name = $name;
     }
-    public function getNombre(): string
+    public  function getNombre(): string
     {
         return $this->name;
     }
@@ -23,7 +23,7 @@ class program
         return $this->code;
     }
 
-    public function guardar(mysqli $db): bool
+    public  function guardar(mysqli $db): bool
     {
         $sql = "INSERT INTO programas (codigo, nombre) VALUES (?, ?)";
         $stmt = $db->prepare($sql);
@@ -45,23 +45,46 @@ class program
 
     public static function getAll(mysqli $db): array
     {
-        $sql    = "SELECT nombre, codigo FROM programa";
-        $result = $db->query($sql);
-
-        $program = [];
-        while ($row = $result->fetch_assoc()) {
-            $program[] = new self(
-                $row['nombre'],
-                $row['codigo']
-            );
-        }
-        return $program;
+        $sql    = "SELECT codigo, nombre FROM programas";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function delet($name)
     {
-        $sql = "SELECT codigo  FROM programa where programa like {$name}";
-        $sql1 = "SELECT nombre, programa  FROM materia where programa like {$sql}";
-        return $sql1;
+        $db = (new Conexion())->getConexion();
+        $name = trim($_GET['name'] ?? '');
+
+        if ($name === '') {
+            echo "Nombre vacío";
+            exit;
+        }
+
+        $stmt = $db->prepare("SELECT DISTINCT p.codigo
+                            FROM programas p
+                            JOIN materias m ON p.codigo = m.programa
+                            WHERE m.nombre LIKE CONCAT(?, '%')");
+        $stmt->bind_param('s', $name);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        if ($res->num_rows === 0) {
+            $sel = $db->prepare("SELECT DISTINCT programa
+                                FROM materias
+                                WHERE nombre LIKE CONCAT(?, '%')");
+            $sel->bind_param('s', $name);
+            $sel->execute();
+            $progCodes = array_column($sel->get_result()->fetch_all(MYSQLI_ASSOC), 'programa');
+
+            if ($progCodes) {
+                $place = implode(',', array_fill(0, count($progCodes), '?'));
+                $del = $db->prepare("DELETE FROM programas WHERE codigo IN ($place)");
+                $del->bind_param(str_repeat('s', count($progCodes)), ...$progCodes);
+                $del->execute();
+                echo "Se eliminaron los programas: " . htmlspecialchars(implode(', ', $progCodes));
+            }
+        } else {
+            echo "Hay programas asociados; no se eliminó nada.";
+        }
     }
 }

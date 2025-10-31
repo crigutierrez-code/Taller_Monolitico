@@ -52,24 +52,48 @@ class subject
 
     public static function getAll(mysqli $db): array
     {
-        $sql    = "SELECT ocdigo, nombre, paragrama FROM  materias";
-        $result = $db->query($sql);
-
-        $students = [];
-        while ($row = $result->fetch_assoc()) {
-            $students[] = new self(
-                $row['codigo'],
-                $row['nombre'],
-                $row['programa']
-            );
-        }
-        return $students;
+        $sql    = "SELECT codigo, nombre, programa FROM  materias";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function delet($name)
     {
-        $sql = "SELECT codigo  FROM materias where nombre like {$name}";
-        $sql1 = "SELECT nombre, programa  FROM progarma where programa like {$sql}";
-        return $sql1;
+        $db = (new Conexion())->getConexion();
+        $name = trim($_GET['name'] ?? '');
+
+        if ($name === '') {
+            echo "Nombre vacío";
+            exit;
+        }
+
+        $stmt = $db->prepare("SELECT DISTINCT p.codigo
+            FROM programas p
+            JOIN materias m ON p.codigo = m.programa
+            WHERE m.nombre LIKE CONCAT(?, '%')");
+        $stmt->bind_param('s', $name);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        if ($res->num_rows === 0) {
+            $sel = $db->prepare("SELECT DISTINCT programa
+                                FROM materias
+                                WHERE nombre LIKE CONCAT(?, '%')");
+            $sel->bind_param('s', $name);
+            $sel->execute();
+            $progCodes = array_column($sel->get_result()->fetch_all(MYSQLI_ASSOC), 'programa');
+
+            if ($progCodes) {
+                $stmt = $db->prepare(
+                    "DELETE FROM materias
+                    WHERE programa IS NULL
+                        OR programa NOT IN (SELECT codigo FROM programas)"
+                );
+                $stmt->execute();
+                echo "Se eliminaron " . $stmt->affected_rows . " materias huérfanas.";
+                }
+        } else {
+            echo "Hay programas asociados; no se eliminó nada.";
+        }
     }
 }

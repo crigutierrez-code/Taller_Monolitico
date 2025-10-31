@@ -41,7 +41,9 @@ class Estudiante
     {
         $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
+
         if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
+        
         $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
         $ok = $stmt->execute();
         $stmt->close();
@@ -60,15 +62,11 @@ class Estudiante
         return $ok;
     }
 
-    public static function getAll(mysqli $db): array
+     public static function getAll(mysqli $db): array
     {
-        $sql = "SELECT codigo, nombre, email, programa FROM estudiantes ORDER BY nombre";
+        $sql = "SELECT codigo, nombre, email, programa FROM estudiantes";
         $res = $db->query($sql);
-        $out = [];
-        while ($r = $res->fetch_assoc()) {
-            $out[] = new self($r['codigo'], $r['nombre'], $r['email'], $r['programa']);
-        }
-        return $out;
+        return $res->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function getByCodigo(mysqli $db, string $codigo): ?self
