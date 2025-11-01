@@ -1,4 +1,5 @@
 <?php
+
 namespace Controllers;
 
 require __DIR__ . '/../Modelo/Conexion.php';
@@ -36,13 +37,19 @@ class NotasController
 
     public function listarDetalle()
     {
-        $sql = "SELECT n.id, n.materia, n.estudiante, n.actividad, n.nota, n.fecha_registro,
-                e.nombre as nombre_estudiante, m.nombre as nombre_materia
-                FROM notas n
-                JOIN estudiantes e ON n.estudiante = e.codigo
-                JOIN materias m ON n.materia = m.codigo
-                ORDER BY n.fecha_registro DESC";
+        $sql = "SELECT n.id, n.materia, n.estudiante, n.actividad, n.nota,
+            e.nombre AS nombre_estudiante, m.nombre AS nombre_materia
+            FROM notas n
+            JOIN estudiantes e ON n.estudiante = e.codigo
+            LEFT JOIN materias m ON n.materia = m.codigo
+            ORDER BY n.id DESC";
+
         $res = $this->db->query($sql);
+        if (!$res) {
+            error_log("SQL listarDetalle error: " . $this->db->error);
+            return [];
+        }
+
         $notas_detalle = [];
         while ($r = $res->fetch_assoc()) {
             $notas_detalle[] = $r;
