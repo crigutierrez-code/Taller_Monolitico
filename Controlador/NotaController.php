@@ -1,4 +1,6 @@
 <?php
+namespace Controllers;
+
 require __DIR__ . '/../Modelo/Conexion.php';
 require __DIR__ . '/../Modelo/Nota.php';
 require __DIR__ . '/../Modelo/Estudiante.php';

@@ -19,8 +19,8 @@ $estudiantes = $controller->listar();
 
 <body>
     <h1>Estudiantes Registrados</h1>
-    <a href="dashboard.php">Volver al Dashboard</a>
-    <a href="estudiantes_form.php">Crear Nuevo Estudiante</a>
+    <a class="btn-cancelar" href="dashboard.php">Volver al Dashboard</a>
+    <a class="btn-crear" href="estudiantes_form.php">Crear Nuevo Estudiante</a>
 
     <table>
         <thead>

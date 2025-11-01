@@ -40,57 +40,58 @@ if ($codigo) {
 
 <body>
     <h1><?php echo $titulo; ?></h1>
-    <a href="estudiantes_list.php">Volver a la lista</a>
+    <div class="container-form"> <a href="estudiantes_list.php" class="btn-cancelar">Volver a la lista</a>
 
-    <form action="<?php echo $action; ?>" method="POST">
+        <form action="<?php echo $action; ?>" method="POST">
 
-        <?php if ($estudiante): ?>
-            <input type="hidden" name="codigo" value="<?php echo $estudiante->getCodigo(); ?>">
-        <?php endif; ?>
+            <?php if ($estudiante): ?>
+                <input type="hidden" name="codigo" value="<?php echo $estudiante->getCodigo(); ?>">
+            <?php endif; ?>
 
-        <div>
-            <label for="codigo">Código:</label>
-            <input
-                type="text"
-                name="codigo"
-                id="codigo"
-                value="<?php echo $estudiante ? $estudiante->getCodigo() : ''; ?>"
-                <?php echo $estudiante ? 'readonly' : 'required'; ?>>
-        </div>
-        <div>
-            <label for="nombre">Nombre:</label>
-            <input
-                type="text"
-                name="nombre"
-                id="nombre"
-                value="<?php echo $estudiante ? $estudiante->getNombre() : ''; ?>"
-                required>
-        </div>
-        <div>
-            <label for="email">Email:</label>
-            <input
-                type="email"
-                name="email"
-                id="email"
-                value="<?php echo $estudiante ? $estudiante->getEmail() : ''; ?>"
-                required>
-        </div>
-        <div>
-            <label for="programa">Programa:</label>
-            <select name="programa" id="programa" required>
-                <option value="">Seleccione un programa...</option>
-                <?php foreach ($programas as $prog): ?>
-                    <option
-                        value="<?php echo $prog['codigo']; ?>"
-                        <?php echo ($estudiante && $estudiante->getPrograma() == $prog['codigo']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($prog['nombre']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+            <div>
+                <label for="codigo">Código:</label>
+                <input
+                    type="text"
+                    name="codigo"
+                    id="codigo"
+                    value="<?php echo $estudiante ? $estudiante->getCodigo() : ''; ?>"
+                    <?php echo $estudiante ? 'readonly' : 'required'; ?>>
+            </div>
+            <div>
+                <label for="nombre">Nombre:</label>
+                <input
+                    type="text"
+                    name="nombre"
+                    id="nombre"
+                    value="<?php echo $estudiante ? $estudiante->getNombre() : ''; ?>"
+                    required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value="<?php echo $estudiante ? $estudiante->getEmail() : ''; ?>"
+                    required>
+            </div>
+            <div>
+                <label for="programa">Programa:</label>
+                <select name="programa" id="programa" required>
+                    <option value="">Seleccione un programa...</option>
+                    <?php foreach ($programas as $prog): ?>
+                        <option
+                            value="<?php echo $prog['codigo']; ?>"
+                            <?php echo ($estudiante && $estudiante->getPrograma() == $prog['codigo']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($prog['nombre']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <button type="submit">Guardar</button>
-    </form>
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
 </body>
 
 </html>
