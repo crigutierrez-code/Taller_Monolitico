@@ -8,11 +8,13 @@ $promedios = $controller->listarPromediosPorMateriaYEstudiante();
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Promedios por Materia y Estudiante</title>
     <link rel="stylesheet" href="../Public/css/estilos.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Promedios de Notas por Materia</h1>
@@ -35,6 +37,7 @@ $promedios = $controller->listarPromediosPorMateriaYEstudiante();
                         <td><?php echo htmlspecialchars($p['promedio']); ?></td>
                         <td>
                             <a href="reporte_detalle_notas.php?mat=<?php echo $p['codigo_materia']; ?>&est=<?php echo $p['codigo_estudiante']; ?>" class="btn-editar">Ver Detalle</a>
+
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -42,4 +45,5 @@ $promedios = $controller->listarPromediosPorMateriaYEstudiante();
         </table>
     </div>
 </body>
+
 </html>

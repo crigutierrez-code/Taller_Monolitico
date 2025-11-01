@@ -12,7 +12,7 @@ class Estudiante
     private $email;
     private $programa;
 
-    public function __construct(string $codigo, string $nombre, string $email, string $programa)
+    public function __construct($codigo = null, $nombre = null, $email = null, $programa = null)
     {
         $this->codigo = $codigo;
         $this->nombre = $nombre;
@@ -20,19 +20,19 @@ class Estudiante
         $this->programa = $programa;
     }
 
-    public function getCodigo(): string
+    public function getCodigo()
     {
         return $this->codigo;
     }
-    public function getNombre(): string
+    public function getNombre()
     {
         return $this->nombre;
     }
-    public function getEmail(): string
+    public function getEmail()
     {
         return $this->email;
     }
-    public function getPrograma(): string
+    public function getPrograma()
     {
         return $this->programa;
     }
@@ -46,16 +46,16 @@ class Estudiante
 
             throw new Exception('Error preparando consulta: ' . $db->error);
         }
-        
+
         $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
-        
+
         if ($stmt->execute()) {
             $stmt->close();
             return true;
         } else {
-            $error = $stmt->error; 
+            $error = $stmt->error;
             $stmt->close();
-            throw new Exception('Error al ejecutar la consulta (guardar): '. $error);
+            throw new Exception('Error al ejecutar la consulta (guardar): ' . $error);
         }
     }
 
@@ -70,7 +70,7 @@ class Estudiante
         if ($tieneNotas) {
             return false;   // No se puede borrar
         }
-        
+
         $sql = "UPDATE estudiantes SET nombre = ?, email = ?, programa = ? WHERE codigo = ?";
         $stmt = $db->prepare($sql);
         if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
@@ -80,7 +80,7 @@ class Estudiante
         return $ok;
     }
 
-     public static function getAll(mysqli $db): array
+    public static function getAll(mysqli $db): array
     {
         $sql = "SELECT codigo, nombre, email, programa FROM estudiantes";
         $res = $db->query($sql);
@@ -125,14 +125,14 @@ class Estudiante
         if ($tieneNotas) {
             return false;   // No se puede borrar
         }
-        
+
         // 2. Borrar estudiante
         $stmt = $db->prepare("DELETE FROM estudiantes WHERE codigo = ?");
         $stmt->bind_param('s', $codigo);
         $ok = $stmt->execute();
         $stmt->close();
 
-        return $ok; 
+        return $ok;
     }
 
     public static function getAllConPrograma(mysqli $db): array
@@ -143,5 +143,4 @@ class Estudiante
         $res = $db->query($sql);
         return $res->fetch_all(MYSQLI_ASSOC);
     }
-
 }

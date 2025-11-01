@@ -12,6 +12,8 @@ use Modelo\Nota;
 use Modelo\Estudiante;
 use Modelo\Materia;
 
+
+
 class NotasController
 {
     private $db;
@@ -21,10 +23,10 @@ class NotasController
         $this->db = (new Conexion())->getConexion();
     }
 
-    
+
     public function listarPromediosPorMateriaYEstudiante()
-{
-    $sql = "SELECT 
+    {
+        $sql = "SELECT 
                 n.materia AS codigo_materia, 
                 m.nombre AS nombre_materia,
                 n.estudiante AS codigo_estudiante, 
@@ -36,33 +38,40 @@ class NotasController
             GROUP BY n.materia, n.estudiante, m.nombre, e.nombre
             ORDER BY m.nombre, e.nombre";
 
-    $res = $this->db->query($sql);
-    $promedios = [];
-    while ($r = $res->fetch_assoc()) {
-        $promedios[] = $r;
+        $res = $this->db->query($sql);
+        $promedios = [];
+        while ($r = $res->fetch_assoc()) {
+            $promedios[] = $r;
+        }
+        return $promedios;
     }
-    return $promedios;
-}
 
-public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, string $estudiante_cod)
-{
-    $sql = "SELECT 
+    public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, string $estudiante_cod)
+    {
+        $sql = "SELECT 
                 n.actividad, 
                 n.nota
             FROM notas n
-            WHERE n.materia = ? AND n.estudiante = ?";
+            WHERE n.materia = ? AND n.estudiante = ?
+            ORDER BY n.actividad ASC";
 
-    $stmt = $this->db->prepare($sql);
-    $stmt->bind_param('ss', $materia_cod, $estudiante_cod);
-    $stmt->execute();
-    $res = $stmt->get_result();
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            die("Error al preparar la consulta: " . $this->db->error);
+        }
 
-    $detalles = [];
-    while ($r = $res->fetch_assoc()) {
-        $detalles[] = $r;
+        $stmt->bind_param('ss', $materia_cod, $estudiante_cod);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        $detalles = [];
+        while ($r = $res->fetch_assoc()) {
+            $detalles[] = $r;
+        }
+        return $detalles;
     }
-    return $detalles;
-}
+
+
 
     public function listarDetalle()
     {
@@ -148,7 +157,4 @@ public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, str
         }
         return Nota::eliminarPorActividad($this->db, $materia, $estudiante, $actividad);
     }
-
-    
-
 }
