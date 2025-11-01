@@ -42,12 +42,25 @@ class Estudiante
         $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
 
-        if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
+        if (!$stmt) {
+
+            throw new Exception('Error preparando consulta: ' . $db->error);
+        }
         
         $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
-        $ok = $stmt->execute();
-        $stmt->close();
-        return $ok;
+        
+        // ===== ¡AQUÍ ESTÁ LA MEJORA! =====
+        if ($stmt->execute()) {
+            // Éxito
+            $stmt->close();
+            return true;
+        } else {
+            // Si la ejecución falla (ej. clave duplicada, FK no existe)
+            $error = $stmt->error; // Capturamos el error de MySQL
+            $stmt->close();
+            // Lanzamos una Excepción para que el 'catch' del Paso 1 la muestre
+            throw new Exception('Error al ejecutar la consulta (guardar): '. $error);
+        }
     }
 
     public function actualizar(mysqli $db): bool
@@ -105,4 +118,14 @@ class Estudiante
         $stmt->close();
         return $ok;
     }
+
+    public static function getAllConPrograma(mysqli $db): array
+    {
+        $sql = "SELECT e.codigo, e.nombre, e.email, p.nombre as programa_nombre
+                FROM estudiantes e
+                JOIN programas p ON e.programa = p.codigo";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
+
 }

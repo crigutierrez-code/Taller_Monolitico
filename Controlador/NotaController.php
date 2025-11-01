@@ -7,7 +7,7 @@ require __DIR__ . '/../Modelo/Materia.php';
 use Modelo\Conexion;
 use Modelo\Nota;
 use Modelo\Estudiante;
-use Modelo\subject;
+use Modelo\Materia;
 
 class NotasController
 {
@@ -51,7 +51,7 @@ class NotasController
     public function crear()
     {
         $estudiantes = Estudiante::getAll($this->db);
-        $materias = subject::getAll($this->db);
+        $materias = Materia::getAll($this->db);
         return ['estudiantes' => $estudiantes, 'materias' => $materias];
     }
 

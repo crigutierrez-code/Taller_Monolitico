@@ -1,11 +1,10 @@
 <?php
-
 namespace Modelo;
 
 use mysqli;
 use Exception;
 
-class program
+class Programa
 {
     private $code;
     private $name;
@@ -35,10 +34,66 @@ class program
         $stmt->close();
         return $ok;
     }
+    
+    public function actualizar(mysqli $db): bool
+    {
+        if (self::tieneRelaciones($db, $this->code)) {
+            return false;
+        }
+
+        $sql = "UPDATE programas SET nombre = ? WHERE codigo = ?";
+        $stmt = $db->prepare($sql);
+        if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
+        
+        $stmt->bind_param('ss', $this->name, $this->code);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+
+    public static function eliminar(mysqli $db, string $codigo): bool
+    {
+        if (self::tieneRelaciones($db, $codigo)) {
+            return false;
+        }
+
+        $sql = "DELETE FROM programas WHERE codigo = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param('s', $codigo);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+    
+    public static function tieneRelaciones(mysqli $db, string $codigo): bool
+    {
+        $sql_est = "SELECT COUNT(*) as c FROM estudiantes WHERE programa = ?";
+        $stmt_est = $db->prepare($sql_est);
+        $stmt_est->bind_param('s', $codigo);
+        $stmt_est->execute();
+        if (intval($stmt_est->get_result()->fetch_assoc()['c']) > 0) {
+            $stmt_est->close();
+            return true;
+        }
+        $stmt_est->close();
+
+        $sql_mat = "SELECT COUNT(*) as c FROM materias WHERE programa = ?";
+        $stmt_mat = $db->prepare($sql_mat);
+        $stmt_mat->bind_param('s', $codigo);
+        $stmt_mat->execute();
+        if (intval($stmt_mat->get_result()->fetch_assoc()['c']) > 0) {
+            $stmt_mat->close();
+            return true;
+        }
+        $stmt_mat->close();
+
+        return false;
+    }
 
     public static function crear(mysqli $db, string $code, string $name): self
     {
-        $est = new program($code,  $name);
+        $est = new self($code,  $name);
         $est->guardar($db);
         return $est;
     }
@@ -49,42 +104,18 @@ class program
         $res = $db->query($sql);
         return $res->fetch_all(MYSQLI_ASSOC);
     }
+    
 
-    public static function delet($name)
+    public static function getByCodigo(mysqli $db, string $codigo): ?self
     {
-        $db = (new Conexion())->getConexion();
-        $name = trim($_GET['name'] ?? '');
-
-        if ($name === '') {
-            echo "Nombre vacío";
-            exit;
-        }
-
-        $stmt = $db->prepare("SELECT DISTINCT p.codigo
-                            FROM programas p
-                            JOIN materias m ON p.codigo = m.programa
-                            WHERE m.nombre LIKE CONCAT(?, '%')");
-        $stmt->bind_param('s', $name);
+        $sql = "SELECT codigo, nombre FROM programas WHERE codigo = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param('s', $codigo);
         $stmt->execute();
         $res = $stmt->get_result();
-
-        if ($res->num_rows === 0) {
-            $sel = $db->prepare("SELECT DISTINCT programa
-                                FROM materias
-                                WHERE nombre LIKE CONCAT(?, '%')");
-            $sel->bind_param('s', $name);
-            $sel->execute();
-            $progCodes = array_column($sel->get_result()->fetch_all(MYSQLI_ASSOC), 'programa');
-
-            if ($progCodes) {
-                $place = implode(',', array_fill(0, count($progCodes), '?'));
-                $del = $db->prepare("DELETE FROM programas WHERE codigo IN ($place)");
-                $del->bind_param(str_repeat('s', count($progCodes)), ...$progCodes);
-                $del->execute();
-                echo "Se eliminaron los programas: " . htmlspecialchars(implode(', ', $progCodes));
-            }
-        } else {
-            echo "Hay programas asociados; no se eliminó nada.";
+        if ($row = $res->fetch_assoc()) {
+            return new self($row['codigo'], $row['nombre']);
         }
+        return null;
     }
 }

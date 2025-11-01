@@ -1,42 +1,75 @@
 <?php
-require_once __DIR__ . '/../Modelo/Conexion.php';
-require_once __DIR__ . '/../Modelo/Estudiante.php';
+require_once __DIR__ . '/../Controlador/EstudianteController.php';
 
-use Modelo\Conexion;
-use Modelo\Estudiante;
+use Controllers\EstudiantesController;
 
-$db = (new Conexion())->getConexion();
-
+$controller = new EstudiantesController();
+$estudiantes = $controller->listar();
 ?>
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8">
-    <title>Crear estudiante</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Estudiantes</title>
+    <link rel="stylesheet" href="../Public/css/estilos.css">
+    <link rel="stylesheet" href="../Public/css/modal.css">
 </head>
+
 <body>
+    <h1>Estudiantes Registrados</h1>
+    <a href="dashboard.php">Volver al Dashboard</a>
+    <a href="estudiantes_form.php">Crear Nuevo Estudiante</a>
 
-<h1>Nuevo estudiante</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Programa</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (count($estudiantes) > 0): ?>
+                <?php foreach ($estudiantes as $est): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($est['codigo']); ?></td>
+                        <td><?php echo htmlspecialchars($est['nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($est['email']); ?></td>
+                        <td><?php echo htmlspecialchars($est['programa_nombre']); ?></td>
+                        <td class="acciones">
+                            <a href="estudiantes_form.php?cod=<?php echo $est['codigo']; ?>" class="btn-editar">Editar</a>
 
-<form action="../Modelo/Funciones/estudiante_crear.php" method="post"></form>
-    <label>Código:<br>
-        <input type="text" name="codigo" required>
-    </label><br>
+                            <button onclick="abrirModalEliminar('<?php echo $est['codigo']; ?>')" class="btn-eliminar">Eliminar</button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5">No hay estudiantes registrados.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-    <label>Nombre:<br>
-        <input type="text" name="nombre" required>
-    </label><br>
+    <div id="modalConfirmacion" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar" onclick="cerrarModalEliminar()">&times;</span>
+            <h2>Confirmar Eliminación</h2>
+            <p>¿Estás seguro de que deseas eliminar este registro?</p>
+            <p>Esta acción no se puede deshacer.</p>
 
-    <label>Email:<br>
-        <input type="email" name="email" required>
-    </label><br>
-
-    <label>Programa:<br>
-        <input type="text" name="programa" required>
-    </label><br>
-
-    <button type="submit">Crear estudiante</button>
-    <a href="../Vista/dashboard.php">Cancelar</a>
-</form>
-
+            <form id="formEliminar" action="operaciones/eliminar_estudiante.php" method="POST">
+                <input type="hidden" name="codigo" id="codigoEliminar">
+                <button type="button" onclick="cerrarModalEliminar()" class="btn-cancelar">Cancelar</button>
+                <button type="submit" class="btn-eliminar">Confirmar Eliminación</button>
+            </form>
+        </div>
+    </div>
+    <script src="../Public/js/modal.js"></script>
 </body>
+
 </html>

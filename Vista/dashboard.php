@@ -6,14 +6,13 @@ require_once __DIR__ . '/../Modelo/Materia.php';
 
 use Modelo\Conexion;
 use Modelo\Estudiante;
-use Modelo\program;
-use Modelo\subject;
-use Modelo\Nota;
+use Modelo\Programa;
+use Modelo\Materia;
 
-$db     = (new Conexion())->getConexion();
-$E  = count(Estudiante::getAll($db));
-$P  = count(program::getAll($db));
-$M  = count(subject::getAll($db));
+$db = (new Conexion())->getConexion();
+$totalEstudiantes = count(Estudiante::getAll($db));
+$totalProgramas = count(Programa::getAll($db));
+$totalMaterias = count(Materia::getAll($db));
 ?>
 
 <!doctype html>
@@ -21,30 +20,33 @@ $M  = count(subject::getAll($db));
 <head>
     <meta charset="utf-8">
     <title>Dashboard</title>
+    <link rel="stylesheet" href="../Public/css/estilos.css">
 </head>
 <body>
 
-<h1>Panel principal</h1>
+    <h1>Panel principal</h1>
 
-<p>Estudiantes registrados: <?= $E ?></p>
-<p>Materias registrados: <?= $M ?></p>
-<p>Programas registrados: <?= $P ?></p>
+    <p>Estudiantes registrados: <?= $totalEstudiantes ?></p>
+    <p>Materias registrados: <?= $totalMaterias ?></p>
+    <p>Programas registrados: <?= $totalProgramas ?></p>
 
+    <h2>Gestión de Entidades</h2>
 
-<form action="../Controlador/EstudianteController.php" method="pos">
-    <button type="submit">Ver todos los estudiantes</button>
-</form>
-<form action="../Vista/estudiantes_list.php" method="pos">
-    <button type="submit">Crear estudiantes</button>
-</form>
+    <h3>Estudiantes</h3>
+    <a href="estudiantes_list.php" class="btn-editar">Ver Lista de Estudiantes</a>
+    <a href="estudiantes_form.php" class="btn-crear">Crear Nuevo Estudiante</a>
 
-<form action="../controlador/MateriaController.php" method="post">
-    <button type="submit">Ver todos las materias</button>
-</form>
+    <h3>Materias</h3>
+    <a href="materias_list.php" class="btn-editar">Ver Lista de Materias</a>
+    <a href="materias_form.php" class="btn-crear">Crear Nueva Materia</a>
 
-<form action="../Controlador/ProgramaController.php" method="post">
-    <button type="submit">Ver todos los programas </button>
-</form>
+    <h3>Programas</h3>
+    <a href="programas_list.php" class="btn-editar">Ver Lista de Programas</a>
+    <a href="programas_form.php" class="btn-crear">Crear Nuevo Programa</a>
+    
+    <h3>Notas</h3>
+    <a href="notas_list.php" class="btn-editar">Ver Lista de Notas</a>
+    <a href="notas_form.php" class="btn-crear">Registrar Nueva Nota</a>
 
 </body>
 </html>

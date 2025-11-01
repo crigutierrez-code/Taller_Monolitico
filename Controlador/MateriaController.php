@@ -1,13 +1,13 @@
 <?php
+namespace Controllers;
 
-
-require __DIR__ . '/../Modelo/Conexion.php';
-require __DIR__ . '/../Modelo/Materia.php';
-require __DIR__ . '/../Modelo/Programa.php';
+require_once __DIR__ . '/../Modelo/Conexion.php';
+require_once __DIR__ . '/../Modelo/Materia.php';
+require_once __DIR__ . '/../Modelo/Programa.php';
 
 use Modelo\Conexion;
-use Modelo\subject;
-use Modelo\Program;
+use Modelo\Materia;
+use Modelo\Programa;
 
 class MateriasController
 {
@@ -18,19 +18,14 @@ class MateriasController
         $this->db = (new Conexion())->getConexion();
     }
 
-     public function listar(): void
+    public function listar()
     {
-        $subject = subject::getAll($this->db);
-
-        // CMD: salida simple
-        foreach ($subject as $e) {
-            echo "{$e['codigo']} | {$e['nombre']} | {$e['programa']} <br>" ;
-        }
+        return Materia::getAll($this->db);
     }
 
     public function crear()
     {
-        return Program::getAll($this->db);
+        return Programa::getAll($this->db);
     }
 
     public function guardar($request)
@@ -42,7 +37,7 @@ class MateriasController
         ) {
             return false;
         }
-        $m = new subject(
+        $m = new Materia(
             $request['codigo'],
             $request['nombre'],
             $request['programa']
@@ -52,16 +47,9 @@ class MateriasController
 
     public function editar($codigo)
     {
-        $list = subject::getAll($this->db);
-        $selected = null;
-        foreach ($list as $x) {
-            if ($x->getCodigo() === $codigo) {
-                $selected = $x;
-                break;
-            }
-        }
-        $programas = Program::getAll($this->db);
-        return ['materia' => $selected, 'programas' => $programas];
+        $materia = Materia::getByCodigo($this->db, $codigo);
+        $programas = Programa::getAll($this->db);
+        return ['materia' => $materia, 'programas' => $programas];
     }
 
     public function actualizar($request)
@@ -73,17 +61,13 @@ class MateriasController
         ) {
             return false;
         }
-        $m = new subject(
+        $m = new Materia(
             $request['codigo'],
             $request['nombre'],
             $request['programa']
         );
-        //return $m->(crear funcion para actualizar)($this->db);
-    }
-
-    public function confirmarEliminar($codigo)
-    {
-        return $codigo;
+        
+        return $m->actualizar($this->db);
     }
 
     public function eliminar($codigo)
@@ -91,15 +75,7 @@ class MateriasController
         if (empty($codigo)) {
             return false;
         }
-        return subject::delet($this->db, $codigo);
+        return Materia::eliminar($this->db, $codigo);
     }
-};
-
-$action = $_GET['action'] ?? 'list';
-
-$controller = new MateriasController();
-match ($action) {
-    'list'   => $controller->listar(),
-    default  => http_response_code(404) and exit('Acción no encontrada')
-};
+}
 ?>

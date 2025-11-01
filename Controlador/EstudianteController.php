@@ -1,4 +1,5 @@
 <?php
+
 namespace Controllers;
 
 require_once __DIR__ . '/../Modelo/Conexion.php';
@@ -8,8 +9,9 @@ require_once __DIR__ . '/../Modelo/Nota.php';
 
 use Modelo\Conexion;
 use Modelo\Estudiante;
-use Modelo\Program;
+use Modelo\Programa;
 use Modelo\Nota;
+
 class EstudiantesController
 {
     private $db;
@@ -17,20 +19,17 @@ class EstudiantesController
     {
         $this->db = (new Conexion())->getConexion();
     }
-    public function listar(): void
-    {
-        $estudiantes = Estudiante::getAll($this->db);
 
-        // CMD: salida simple
-        foreach ($estudiantes as $e) {
-            echo "{$e['codigo']} | {$e['nombre']} | {$e['email']} | {$e['programa']} <br>";
-        }
+
+    public function listar()
+    {
+        
+        return Estudiante::getAllConPrograma($this->db);
     }
 
     public function crear()
     {
-        $programas = Program::getAll($this->db);
-        return $programas;
+        return Programa::getAll($this->db);
     }
 
     public function guardar($request)
@@ -55,9 +54,10 @@ class EstudiantesController
     public function editar($codigo)
     {
         $est = Estudiante::getByCodigo($this->db, $codigo);
-        $programas = Program::getAll($this->db);
+        $programas = Programa::getAll($this->db);
         return ['estudiante' => $est, 'programas' => $programas];
     }
+
     public function actualizar($request)
     {
         if (
@@ -68,9 +68,11 @@ class EstudiantesController
         ) {
             return false;
         }
+
         if (Estudiante::tieneNotas($this->db, $request['codigo'])) {
             return false;
         }
+
         $est = new Estudiante(
             $request['codigo'],
             $request['nombre'],
@@ -80,25 +82,21 @@ class EstudiantesController
         return $est->actualizar($this->db);
     }
 
-    public function confirmarEliminar($codigo)
-    {
-        return $codigo;
-    }
-
     public function eliminar($codigo)
     {
         if (empty($codigo)) {
             return false;
         }
-        return Estudiante::eliminar($this->db, $codigo);
+
+        if (Estudiante::tieneNotas($this->db, $codigo)) {
+            return false;
+        }
+        
+        try {
+             return Estudiante::eliminar($this->db, $codigo);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
-};
-
-$action = $_GET['action'] ?? 'list';
-
-$controller = new EstudiantesController();
-match ($action) {
-    'list'   => $controller->listar(),
-    default  => http_response_code(404) and exit('Acción no encontrada')
-};
+}
 ?>

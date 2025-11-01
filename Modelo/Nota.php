@@ -48,8 +48,6 @@ class Nota
         return $res->fetch_assoc() ?: null;
     }
 
-    /* ---------- GETTERS ÚTILES (si necesitas instancias) ---------- */
-
     public function getMateria(): ?string { return $this->materia; }
     public function getEstudiante(): ?string { return $this->estudiante; }
     public function getActividad(): ?string { return $this->actividad; }
