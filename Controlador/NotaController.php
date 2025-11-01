@@ -2,10 +2,10 @@
 
 namespace Controllers;
 
-require __DIR__ . '/../Modelo/Conexion.php';
-require __DIR__ . '/../Modelo/Nota.php';
-require __DIR__ . '/../Modelo/Estudiante.php';
-require __DIR__ . '/../Modelo/Materia.php';
+require_once __DIR__ . '/../Modelo/Conexion.php';
+require_once __DIR__ . '/../Modelo/Nota.php';
+require_once __DIR__ . '/../Modelo/Estudiante.php';
+require_once __DIR__ . '/../Modelo/Materia.php';
 
 use Modelo\Conexion;
 use Modelo\Nota;
