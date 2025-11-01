@@ -21,15 +21,50 @@ class NotasController
         $this->db = (new Conexion())->getConexion();
     }
 
-    public function listar(): void
-    {
-        $subject = Nota::getAll($this->db);
+    
+    public function listarPromediosPorMateriaYEstudiante()
+{
+    $sql = "SELECT 
+                n.materia AS codigo_materia, 
+                m.nombre AS nombre_materia,
+                n.estudiante AS codigo_estudiante, 
+                e.nombre AS nombre_estudiante,
+                ROUND(AVG(n.nota), 2) AS promedio
+            FROM notas n
+            JOIN estudiantes e ON n.estudiante = e.codigo
+            JOIN materias m ON n.materia = m.codigo
+            GROUP BY n.materia, n.estudiante, m.nombre, e.nombre
+            ORDER BY m.nombre, e.nombre";
 
-        // CMD: salida simple
-        foreach ($subject as $e) {
-            echo "{$e['id']} | {$e['materia']} | {$e['estudiante']} | {$e['actividad']} | {$e['nota']} <br>" ;
-        }
+    $res = $this->db->query($sql);
+    $promedios = [];
+    while ($r = $res->fetch_assoc()) {
+        $promedios[] = $r;
     }
+    return ;
+}
+
+public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, string $estudiante_cod)
+{
+    $sql = "SELECT 
+                n.actividad, 
+                n.nota, 
+                n.fecha_registro
+            FROM notas n
+            WHERE n.materia = ? AND n.estudiante = ?
+            ORDER BY n.fecha_registro DESC";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param('ss', $materia_cod, $estudiante_cod);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    $detalles = [];
+    while ($r = $res->fetch_assoc()) {
+        $detalles[] = $r;
+    }
+    return $detalles;
+}
 
     public function listarDetalle()
     {
@@ -115,5 +150,7 @@ class NotasController
         }
         return Nota::eliminarPorActividad($this->db, $materia, $estudiante, $actividad);
     }
+
+    
 
 }
