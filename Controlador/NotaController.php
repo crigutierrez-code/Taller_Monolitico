@@ -41,7 +41,7 @@ class NotasController
     while ($r = $res->fetch_assoc()) {
         $promedios[] = $r;
     }
-    return ;
+    return $promedios;
 }
 
 public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, string $estudiante_cod)
