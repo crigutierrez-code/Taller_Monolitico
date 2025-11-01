@@ -61,7 +61,7 @@ class Estudiante
 
     public function actualizar(mysqli $db): bool
     {
-        $stmt = $db->prepare("SELECT 1 FROM nota WHERE estudiantes = ? LIMIT 1");
+        $stmt = $db->prepare("SELECT 1 FROM notas WHERE estudiante = ? LIMIT 1");
         $stmt->bind_param('s', $codigo);
         $stmt->execute();
         $tieneNotas = $stmt->get_result()->fetch_assoc() !== null;
@@ -116,11 +116,11 @@ class Estudiante
         if (self::tieneNotas($db, $codigo)) {
             throw new Exception("No se puede eliminar: estudiante tiene notas registradas.");
         }
-        $stmt = $db->prepare("SELECT 1 FROM nota WHERE estudiantes = ? LIMIT 1");
-        $stmt->bind_param('s', $codigo);
-        $stmt->execute();
-        $tieneNotas = $stmt->get_result()->fetch_assoc() !== null;
-        $stmt->close();
+        $sql = $db->prepare("SELECT 1 FROM notas WHERE materias = $codigo LIMIT 1");
+        $sql->bind_param('s', $codigo);
+        $sql->execute();
+        $tieneNotas = $sql->get_result()->fetch_assoc() !== null;
+        $sql->close();
 
         if ($tieneNotas) {
             return false;   // No se puede borrar

@@ -1,12 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../../Controlador/EstudianteController.php';
-use Controllers\EstudiantesController;
+require_once __DIR__ . '/../../Modelo/Estudiante.php';
 
+use Controllers\EstudiantesController;
+use Modelo\Estudiante;
+
+/*
 if ($controller->tieneNotas($codigo)) {
     header("Location: ../estudiantes_list.php?eliminado=2");
     exit;
 }
+    */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo'])) {
     $controller = new EstudiantesController();

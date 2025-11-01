@@ -50,6 +50,12 @@ $totalMaterias = count(Materia::getAll($db));
         <h3>Notas</h3>
         <a href="notas_list.php" class="btn-lista btn-dashboard">Ver Lista de Notas</a>
         <a href="notas_form.php" class="btn-crear btn-dashboard">Registrar Nueva Nota</a>
+        
+        <h3>Reporte</h3>
+        <a href="reporte_detalle_notas.php" class="btn-crear btn-dashboard">Reporte detalle notas</a>
+        <a href="reporte_promedios_estudiante.php" class="btn-crear btn-dashboard">Reporte detalle notas</a>
+        <a href="reporte_promedios_materia.php" class="btn-crear btn-dashboard">Reporte promedios materia</a>
+        
     </div>
 </body>
 

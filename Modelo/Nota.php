@@ -39,6 +39,15 @@ class Nota
         return $stmt->execute();
     }
 
+    public static function listarConPromedio(mysqli $db): array
+    {
+    $sql = "SELECT n.estudiante,e.nombre,ROUND(AVG(n.nota), 2) AS promedio
+            FROM nota n
+            JOIN estudiante e ON e.codigo = n.estudiante
+            GROUP BY n.estudiante, e.nombre
+            ORDER BY promedio DESC";
+    return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
+    }
     public static function getAll(mysqli $db): array
     {
         $sql    = "SELECT id, materia, estudiante , actividad, nota FROM  notas";
@@ -72,4 +81,11 @@ class Nota
     {
         return $this->nota;
     }
+
+    /*
+    $prom = Nota::promedioGeneral($db);
+        echo $prom === null
+        ? 'Aún no hay notas registradas.'
+        : "Promedio general de notas: $prom";
+     */
 }

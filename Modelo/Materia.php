@@ -62,21 +62,21 @@ class Materia
         return $ok;
     }
 
-    private static function estaEnUso(mysqli $db, string $codigo): bool
+   /* private static function estaEnUso(mysqli $db, string $codigo): bool
 {
     // 1. ¿Tiene notas?
-    $stmt = $db->prepare("SELECT 1 FROM nota WHERE materia = ? LIMIT 1");
-    $stmt->bind_param('s', $codigo);
-    $stmt->execute();
-    $enNotas = $stmt->get_result()->fetch_assoc() !== null;
-    $stmt->close();
+    $sql = $db->prepare("SELECT codiog FROM notas WHERE materias = $codigo LIMIT 1");
+    $sql->bind_param('s', $codigo);
+    $sql->execute();
+    $enNotas = $sql->get_result()->fetch_assoc() !== null;
+    $sql->close();
     if ($enNotas) return true;
 
     // 2. ¿Hay estudiantes en el programa al que pertenece esta materia?
     $stmt = $db->prepare(
         "SELECT 1
-         FROM estudiante e
-         JOIN materia m ON m.programa = e.programa
+         FROM estudiantes e
+         JOIN materias m ON m.programas = e.programas
          WHERE m.codigo = ?
          LIMIT 1"
     );
@@ -86,17 +86,18 @@ class Materia
     $stmt->close();
 
     return $enEstudiantes;
-}
+}*/
     public static function eliminar(mysqli $db, string $codigo): bool
     {
 
         if (self::tieneNotas($db, $codigo)) {
             return false;
         }
-        if (self::estaEnUso($db, $codigo)) {
+        /*
+               if (self::estaEnUso($db, $codigo)) {
         return false; // No se puede borrar
         }
-
+*/
         $sql = "DELETE FROM materias WHERE codigo = ?";
         $stmt = $db->prepare($sql);
         $stmt->bind_param('s', $codigo);

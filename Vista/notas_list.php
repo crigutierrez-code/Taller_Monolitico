@@ -40,7 +40,6 @@ $notas_detalle = $controller->listarDetalle();
                         <td><?php echo htmlspecialchars($n['nombre_materia'] . ' (' . $n['materia'] . ')'); ?></td>
                         <td><?php echo htmlspecialchars($n['actividad']); ?></td>
                         <td><?php echo htmlspecialchars($n['nota']); ?></td>
-                        <td><?php echo htmlspecialchars($n['fecha_registro']); ?></td>
                         <td class="acciones">
                             <a href="notas_form.php?mat=<?php echo $n['materia']; ?>&est=<?php echo $n['estudiante']; ?>&act=<?php echo urlencode($n['actividad']); ?>" class="btn-editar">Editar</a>
 

@@ -38,9 +38,11 @@ class Programa
 
     public function actualizar(mysqli $db): bool
     {
+        /*
         if (self::tieneRelaciones($db, $this->code)) {
             return false;
         }
+            */
 
         $sql = "UPDATE programas SET nombre = ? WHERE codigo = ?";
         $stmt = $db->prepare($sql);
@@ -55,9 +57,11 @@ class Programa
 
     public static function eliminar(mysqli $db, string $codigo): bool
     {
+        /*
         if (self::tieneRelaciones($db, $codigo)) {
             return false;
         }
+            */
        
         $sql = "DELETE FROM programas WHERE codigo = ?";
         $stmt = $db->prepare($sql);
@@ -66,10 +70,10 @@ class Programa
         $stmt->close();
         return $ok;
     }
-
+/*
     public static function tieneRelaciones(mysqli $db, string $codigo): bool
     {
-        $sql_est = "SELECT COUNT(*) as c FROM estudiantes WHERE programa = ?";
+        $sql_est = "SELECT COUNT(*) as c FROM estudiantes WHERE programa = $codigo";
         $stmt_est = $db->prepare($sql_est);
         $stmt_est->bind_param('s', $codigo);
         $stmt_est->execute();
@@ -90,7 +94,7 @@ class Programa
         $stmt_mat->close();
 
         return false;
-    }
+    }*/
 
     public static function crear(mysqli $db, string $code, string $name): self
     {
