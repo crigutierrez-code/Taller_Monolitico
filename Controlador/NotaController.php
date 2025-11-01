@@ -48,11 +48,9 @@ public function listarNotasDetallePorEstudianteYMateria(string $materia_cod, str
 {
     $sql = "SELECT 
                 n.actividad, 
-                n.nota, 
-                n.fecha_registro
+                n.nota
             FROM notas n
-            WHERE n.materia = ? AND n.estudiante = ?
-            ORDER BY n.fecha_registro DESC";
+            WHERE n.materia = ? AND n.estudiante = ?";
 
     $stmt = $this->db->prepare($sql);
     $stmt->bind_param('ss', $materia_cod, $estudiante_cod);
