@@ -39,15 +39,31 @@ class Estudiante
 
     public function guardar(mysqli $db): bool
     {
-        $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
-        $stmt = $db->prepare($sql);
-
-        if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
-        
-        $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
-        $ok = $stmt->execute();
-        $stmt->close();
-        return $ok;
+    // Validaciones antes de guardar
+    if (empty($this->codigo) || empty($this->nombre) || 
+        empty($this->email) || empty($this->programa)) {
+        throw new Exception("Todos los campos son obligatorios");
+    }
+    
+    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        throw new Exception("Email inválido");
+    }
+    
+    // Verificar código duplicado
+    $existe = $db->prepare("SELECT codigo FROM estudiantes WHERE codigo = ?");
+    $existe->bind_param('s', $this->codigo);
+    $existe->execute();
+    if ($existe->get_result()->num_rows > 0) {
+        throw new Exception("Código de estudiante ya existe");
+    }
+    
+    // Guardar
+    $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
+    $ok = $stmt->execute();
+    $stmt->close();
+    return $ok;
     }
 
     public function actualizar(mysqli $db): bool

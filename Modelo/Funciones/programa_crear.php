@@ -5,11 +5,9 @@ $conexion = new mysqli("localhost", "root", "", "notas_app");
 // Recibir datos
 $codigo = trim($_POST['codigo'] ?? '');
 $nombre = trim($_POST['nombre'] ?? '');
-$email  = trim($_POST['email']  ?? '');
-$programa = trim($_POST['programa'] ?? '');
 
 // Validar
-if (empty($codigo) || empty($nombre) || empty($email) || empty($programa)) {
+if (empty($codigo) || empty($nombre)) {
     header("Location: ../../Vista/estudiantes_form.php?error=campos_vacios");
     exit;
 }
@@ -26,9 +24,9 @@ if ($check->num_rows > 0) {
 $check->close();
 
 // Insertar
-$stmt = $conexion->prepare("INSERT INTO estudiantes (codigo, nombre, email, programa) 
-VALUES (?, ?, ?, ?)");
-$stmt->bind_param("ssss", $codigo, $nombre, $email, $programa);
+$stmt = $conexion->prepare("INSERT INTO programas (codigo, nombre) 
+VALUES (?, ?)");
+$stmt->bind_param("ss", $codigo, $nombre);
 
 if ($stmt->execute()) {
     header("Location: ../../Vista/dashboard.php");

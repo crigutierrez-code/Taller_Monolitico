@@ -7,36 +7,44 @@ use Modelo\Estudiante;
 
 $db = (new Conexion())->getConexion();
 
+
+
 ?>
+
+/--------------------/
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Crear estudiante</title>
+    <meta charset="UTF-8">
+    <title>Crear Estudiante</title>
 </head>
 <body>
 
-<h1>Nuevo estudiante</h1>
+<h1>Nuevo Programa</h1>
 
-<form action="../Modelo/Funciones/estudiante_crear.php" method="post"></form>
-    <label>Código:<br>
+<form action="../Modelo/Funciones/estudiante_crear.php" method="post">
+
+    <label>Código único
         <input type="text" name="codigo" required>
-    </label><br>
+    </label>
 
-    <label>Nombre:<br>
+    <label>Nombre completo
         <input type="text" name="nombre" required>
-    </label><br>
+    </label>
 
-    <label>Email:<br>
+    <label>Email
         <input type="email" name="email" required>
-    </label><br>
+    </label>
 
-    <label>Programa:<br>
-        <input type="text" name="programa" required>
-    </label><br>
+    <label>Programa
+        <select name="programa" required>
+            <option value="1111" selected>Ing. Sistemas</option>
+            <option value="2222"selected>Ing. Multimedia</option>
+        </select>
+    </label>
 
-    <button type="submit">Crear estudiante</button>
-    <a href="../Vista/dashboard.php">Cancelar</a>
+    <button type="submit">Guardar estudiante</button>
+    <a href="../Vista/dashboard.php">volver</a>
 </form>
-
 </body>
 </html>

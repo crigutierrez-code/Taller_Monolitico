@@ -39,6 +39,13 @@ class Nota
         return $stmt->execute();
     }
 
+    public static function getAll(mysqli $db): array
+    {
+        $sql    = "SELECT id, materia, estudiante , actividad, nota FROM  notas";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
+
     public static function getByClaveCompleta(mysqli $db, string $materia, string $estudiante, string $actividad): ?array
     {
         $stmt = $db->prepare("SELECT * FROM notas WHERE materia = ? AND estudiante = ? AND actividad = ? LIMIT 1");

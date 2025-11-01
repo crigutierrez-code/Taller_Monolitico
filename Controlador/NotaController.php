@@ -18,18 +18,14 @@ class NotasController
         $this->db = (new Conexion())->getConexion();
     }
 
-    public function listar()
+    public function listar(): void
     {
-        $sql = "SELECT n.materia, n.estudiante, ROUND(AVG(n.nota),2) as promedio
-                FROM notas n
-                GROUP BY n.materia, n.estudiante
-                ORDER BY n.materia, n.estudiante";
-        $res = $this->db->query($sql);
-        $promedios = [];
-        while ($r = $res->fetch_assoc()) {
-            $promedios[] = $r;
+        $subject = Nota::getAll($this->db);
+
+        // CMD: salida simple
+        foreach ($subject as $e) {
+            echo "{$e['id']} | {$e['materia']} | {$e['estudiante']} | {$e['actividad']} | {$e['nota']} <br>" ;
         }
-        return $promedios;
     }
 
     public function listarDetalle()
@@ -111,3 +107,12 @@ class NotasController
         return Nota::eliminarPorActividad($this->db, $materia, $estudiante, $actividad);
     }
 }
+
+$action = $_GET['action'] ?? 'list';
+
+$controller = new NotasController();
+match ($action) {
+    'list'   => $controller->listar(),
+    default  => http_response_code(404) and exit('Acción no encontrada')
+};
+?>
