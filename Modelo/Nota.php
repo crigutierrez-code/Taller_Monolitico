@@ -48,12 +48,6 @@ class Nota
         return $res->fetch_assoc() ?: null;
     }
 
-    public static function getAll(mysqli $db): array
-    {
-        $sql    = "SELECT estudiante, materia, nota FROM notas";
-        $res = $db->query($sql);
-        return $res->fetch_all(MYSQLI_ASSOC);
-    }
 
     public function getMateria(): ?string
     {

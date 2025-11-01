@@ -14,7 +14,6 @@ $db = (new Conexion())->getConexion();
 $totalEstudiantes = count(Estudiante::getAll($db));
 $totalProgramas = count(Programa::getAll($db));
 $totalMaterias = count(Materia::getAll($db));
-//$totalNotas = count(Nota::getAll($db)); error 500 (nose porque pasa cuando intento algo con notas
 ?>
 
 <!doctype html>
