@@ -1,10 +1,12 @@
 <?php
 
-require __DIR__ . '/../Modelo/Conexion.php';
-require __DIR__ . '/../Modelo/Programa.php';
+namespace Controllers;
+
+require_once __DIR__ . '/../Modelo/Conexion.php';
+require_once __DIR__ . '/../Modelo/Programa.php';
 
 use Modelo\Conexion;
-use Modelo\program;
+use Modelo\Programa;
 
 class ProgramasController
 {
@@ -15,19 +17,14 @@ class ProgramasController
         $this->db = (new Conexion())->getConexion();
     }
 
-    public function listar(): void
+    public function listar()
     {
-        $estudiantes = Program::getAll($this->db);
-
-        // CMD: salida simple
-        foreach ($estudiantes as $e) {
-            echo "{$e['codigo']} | {$e['nombre']}  <br>" ;
-        }
+        return Programa::getAll($this->db);
     }
 
     public function crear()
     {
-        return true; // no necesita datos adicionales
+        return true;
     }
 
     public function guardar($request)
@@ -38,19 +35,13 @@ class ProgramasController
         ) {
             return false;
         }
-        $p = new Program($request['codigo'], $request['nombre']);
+        $p = new Programa($request['codigo'], $request['nombre']);
         return $p->guardar($this->db);
     }
 
     public function editar($codigo)
     {
-        $list = Program::getAll($this->db);
-        foreach ($list as $x) {
-            if ($x->getCodigo() === $codigo) {
-                return $x;
-            }
-        }
-        return null;
+        return Programa::getByCodigo($this->db, $codigo);
     }
 
     public function actualizar($request)
@@ -61,13 +52,9 @@ class ProgramasController
         ) {
             return false;
         }
-        $p = new Program($request['codigo'], $request['nombre']);
-        //return $p->(crear metodo para catualizar nombre)($this->db);
-    }
+        $p = new Programa($request['codigo'], $request['nombre']);
 
-    public function confirmarEliminar($codigo)
-    {
-        return $codigo;
+        return $p->actualizar($this->db);
     }
 
     public function eliminar($codigo)
@@ -75,15 +62,7 @@ class ProgramasController
         if (empty($codigo)) {
             return false;
         }
-        return Program::delet($this->db, $codigo);
+
+        return Programa::eliminar($this->db, $codigo);
     }
-};
-
-$action = $_GET['action'] ?? 'list';
-
-$controller = new ProgramasController();
-match ($action) {
-    'list'   => $controller->listar(),
-    default  => http_response_code(404) and exit('Acción no encontrada')
-};
-?>
+}

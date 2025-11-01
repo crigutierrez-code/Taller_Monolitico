@@ -39,36 +39,38 @@ class Estudiante
 
     public function guardar(mysqli $db): bool
     {
-    // Validaciones antes de guardar
-    if (empty($this->codigo) || empty($this->nombre) || 
-        empty($this->email) || empty($this->programa)) {
-        throw new Exception("Todos los campos son obligatorios");
-    }
-    
-    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-        throw new Exception("Email inválido");
-    }
-    
-    // Verificar código duplicado
-    $existe = $db->prepare("SELECT codigo FROM estudiantes WHERE codigo = ?");
-    $existe->bind_param('s', $this->codigo);
-    $existe->execute();
-    if ($existe->get_result()->num_rows > 0) {
-        throw new Exception("Código de estudiante ya existe");
-    }
-    
-    // Guardar
-    $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
-    $stmt = $db->prepare($sql);
-    $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
-    $ok = $stmt->execute();
-    $stmt->close();
-    return $ok;
+        $sql = "INSERT INTO estudiantes (codigo, nombre, email, programa) VALUES (?, ?, ?, ?)";
+        $stmt = $db->prepare($sql);
+
+        if (!$stmt) {
+
+            throw new Exception('Error preparando consulta: ' . $db->error);
+        }
+        
+        $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
+        
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            $error = $stmt->error; 
+            $stmt->close();
+            throw new Exception('Error al ejecutar la consulta (guardar): '. $error);
+        }
     }
 
     public function actualizar(mysqli $db): bool
     {
-        // no permite cambiar el código; se debe validar antes que no tenga notas
+        $stmt = $db->prepare("SELECT 1 FROM nota WHERE estudiantes = ? LIMIT 1");
+        $stmt->bind_param('s', $codigo);
+        $stmt->execute();
+        $tieneNotas = $stmt->get_result()->fetch_assoc() !== null;
+        $stmt->close();
+
+        if ($tieneNotas) {
+            return false;   // No se puede borrar
+        }
+        
         $sql = "UPDATE estudiantes SET nombre = ?, email = ?, programa = ? WHERE codigo = ?";
         $stmt = $db->prepare($sql);
         if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
@@ -114,11 +116,32 @@ class Estudiante
         if (self::tieneNotas($db, $codigo)) {
             throw new Exception("No se puede eliminar: estudiante tiene notas registradas.");
         }
-        $sql = "DELETE FROM estudiantes WHERE codigo = ?";
-        $stmt = $db->prepare($sql);
+        $stmt = $db->prepare("SELECT 1 FROM nota WHERE estudiantes = ? LIMIT 1");
+        $stmt->bind_param('s', $codigo);
+        $stmt->execute();
+        $tieneNotas = $stmt->get_result()->fetch_assoc() !== null;
+        $stmt->close();
+
+        if ($tieneNotas) {
+            return false;   // No se puede borrar
+        }
+        
+        // 2. Borrar estudiante
+        $stmt = $db->prepare("DELETE FROM estudiantes WHERE codigo = ?");
         $stmt->bind_param('s', $codigo);
         $ok = $stmt->execute();
         $stmt->close();
-        return $ok;
+
+        return $ok; 
     }
+
+    public static function getAllConPrograma(mysqli $db): array
+    {
+        $sql = "SELECT e.codigo, e.nombre, e.email, p.nombre as programa_nombre
+                FROM estudiantes e
+                JOIN programas p ON e.programa = p.codigo";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
+
 }

@@ -1,4 +1,7 @@
 <?php
+
+namespace Controllers;
+
 require __DIR__ . '/../Modelo/Conexion.php';
 require __DIR__ . '/../Modelo/Nota.php';
 require __DIR__ . '/../Modelo/Estudiante.php';
@@ -7,7 +10,7 @@ require __DIR__ . '/../Modelo/Materia.php';
 use Modelo\Conexion;
 use Modelo\Nota;
 use Modelo\Estudiante;
-use Modelo\subject;
+use Modelo\Materia;
 
 class NotasController
 {
@@ -30,13 +33,19 @@ class NotasController
 
     public function listarDetalle()
     {
-        $sql = "SELECT n.id, n.materia, n.estudiante, n.actividad, n.nota, n.fecha_registro,
-                e.nombre as nombre_estudiante, m.nombre as nombre_materia
-                FROM notas n
-                JOIN estudiantes e ON n.estudiante = e.codigo
-                JOIN materias m ON n.materia = m.codigo
-                ORDER BY n.fecha_registro DESC";
+        $sql = "SELECT n.id, n.materia, n.estudiante, n.actividad, n.nota,
+            e.nombre AS nombre_estudiante, m.nombre AS nombre_materia
+            FROM notas n
+            JOIN estudiantes e ON n.estudiante = e.codigo
+            LEFT JOIN materias m ON n.materia = m.codigo
+            ORDER BY n.id DESC";
+
         $res = $this->db->query($sql);
+        if (!$res) {
+            error_log("SQL listarDetalle error: " . $this->db->error);
+            return [];
+        }
+
         $notas_detalle = [];
         while ($r = $res->fetch_assoc()) {
             $notas_detalle[] = $r;
@@ -47,7 +56,7 @@ class NotasController
     public function crear()
     {
         $estudiantes = Estudiante::getAll($this->db);
-        $materias = subject::getAll($this->db);
+        $materias = Materia::getAll($this->db);
         return ['estudiantes' => $estudiantes, 'materias' => $materias];
     }
 
@@ -106,13 +115,5 @@ class NotasController
         }
         return Nota::eliminarPorActividad($this->db, $materia, $estudiante, $actividad);
     }
+
 }
-
-$action = $_GET['action'] ?? 'list';
-
-$controller = new NotasController();
-match ($action) {
-    'list'   => $controller->listar(),
-    default  => http_response_code(404) and exit('Acción no encontrada')
-};
-?>
