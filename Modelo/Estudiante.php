@@ -49,23 +49,18 @@ class Estudiante
         
         $stmt->bind_param('ssss', $this->codigo, $this->nombre, $this->email, $this->programa);
         
-        // ===== ¡AQUÍ ESTÁ LA MEJORA! =====
         if ($stmt->execute()) {
-            // Éxito
             $stmt->close();
             return true;
         } else {
-            // Si la ejecución falla (ej. clave duplicada, FK no existe)
-            $error = $stmt->error; // Capturamos el error de MySQL
+            $error = $stmt->error; 
             $stmt->close();
-            // Lanzamos una Excepción para que el 'catch' del Paso 1 la muestre
             throw new Exception('Error al ejecutar la consulta (guardar): '. $error);
         }
     }
 
     public function actualizar(mysqli $db): bool
     {
-        // no permite cambiar el código; se debe validar antes que no tenga notas
         $sql = "UPDATE estudiantes SET nombre = ?, email = ?, programa = ? WHERE codigo = ?";
         $stmt = $db->prepare($sql);
         if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);

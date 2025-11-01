@@ -1,4 +1,5 @@
 <?php
+
 namespace Modelo;
 
 use mysqli;
@@ -34,7 +35,7 @@ class Programa
         $stmt->close();
         return $ok;
     }
-    
+
     public function actualizar(mysqli $db): bool
     {
         if (self::tieneRelaciones($db, $this->code)) {
@@ -44,7 +45,7 @@ class Programa
         $sql = "UPDATE programas SET nombre = ? WHERE codigo = ?";
         $stmt = $db->prepare($sql);
         if (!$stmt) throw new Exception('Error preparando consulta: ' . $db->error);
-        
+
         $stmt->bind_param('ss', $this->name, $this->code);
         $ok = $stmt->execute();
         $stmt->close();
@@ -65,7 +66,7 @@ class Programa
         $stmt->close();
         return $ok;
     }
-    
+
     public static function tieneRelaciones(mysqli $db, string $codigo): bool
     {
         $sql_est = "SELECT COUNT(*) as c FROM estudiantes WHERE programa = ?";
@@ -104,7 +105,7 @@ class Programa
         $res = $db->query($sql);
         return $res->fetch_all(MYSQLI_ASSOC);
     }
-    
+
 
     public static function getByCodigo(mysqli $db, string $codigo): ?self
     {

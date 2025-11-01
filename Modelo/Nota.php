@@ -21,7 +21,7 @@ class Nota
     public static function guardar(mysqli $db, string $materia, string $estudiante, string $actividad, float $nota): bool
     {
         $stmt = $db->prepare("INSERT INTO notas (materia, estudiante, actividad, nota) VALUES (?,?,?,?)");
-        $stmt->bind_param('sssd', $materia, $estudiante, $actividad, $nota); // Corregido a 'sssd'
+        $stmt->bind_param('sssd', $materia, $estudiante, $actividad, $nota);
         return $stmt->execute();
     }
 
@@ -46,6 +46,13 @@ class Nota
         $stmt->execute();
         $res = $stmt->get_result();
         return $res->fetch_assoc() ?: null;
+    }
+
+    public static function getAll(mysqli $db): array
+    {
+        $sql    = "SELECT estudiante, materia, nota FROM notas";
+        $res = $db->query($sql);
+        return $res->fetch_all(MYSQLI_ASSOC);
     }
 
     public function getMateria(): ?string
